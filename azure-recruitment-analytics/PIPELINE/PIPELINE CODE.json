@@ -1,0 +1,1834 @@
+{
+    "name": "CopyPipeline_hfr",
+    "properties": {
+        "activities": [
+            {
+                "name": "LocalToStg",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [
+                    {
+                        "name": "Source",
+                        "value": "/"
+                    },
+                    {
+                        "name": "Destination",
+                        "value": "staging//"
+                    }
+                ],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "SftpReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*"
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings",
+                            "skipLineCount": 0
+                        }
+                    },
+                    "sink": {
+                        "type": "DelimitedTextSink",
+                        "storeSettings": {
+                            "type": "AzureBlobFSWriteSettings"
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextWriteSettings",
+                            "quoteAllText": true,
+                            "fileExtension": ".txt"
+                        }
+                    },
+                    "enableStaging": false,
+                    "parallelCopies": 30,
+                    "dataIntegrationUnits": 8
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText29",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "DestinationDataset_hfr",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "RecruitmentMasTable",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "LocalToStg",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.csv",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureTableSink",
+                        "azureTableInsertType": {
+                            "value": "$$Text.Format('RecordAddedDate eq datetime\\\\'{0:yyyy-MM-ddTHH:mm:ss}\\\\'', SliceStart)",
+                            "type": "Expression"
+                        },
+                        "writeBatchSize": 10000
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "Request_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Request_Id",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Role",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Role",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Experience",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Experience",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Client",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Client",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Total_Requisition",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Total_Requisition",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Project",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Project",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Opened_On",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Opened_On",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Priority",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Priority",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Location",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Location",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "On_Hold_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "On_Hold_Date"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Role_Category",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Role_Category"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Recruiter"
+                                },
+                                "sink": {
+                                    "name": "Recruiter"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Resumed_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Resumed_Date"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Cancelled_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Cancelled_Date"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Skills",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Skills"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Status",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Status"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Remarks",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Remarks"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText19",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "AzureTable9",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "EmployeeMasTable",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "LocalToStg",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.csv",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureTableSink",
+                        "azureTableInsertType": {
+                            "value": "$$Text.Format('RecordAddedDate eq datetime\\\\'{0:yyyy-MM-ddTHH:mm:ss}\\\\'', SliceStart)",
+                            "type": "Expression"
+                        },
+                        "writeBatchSize": 10000
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "Emp_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Emp_Id",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Name",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Name"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Candidate_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Candidate_Id",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Request_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Request_Id",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Joined_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Joined_Date",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Salary",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Salary",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Last_Salary",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Last_Salary",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Hike_Pert"
+                                },
+                                "sink": {
+                                    "name": "Hike_Pert"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText20",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "AzureTable11",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "InterviewMasTable",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "LocalToStg",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.csv",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureTableSink",
+                        "azureTableInsertType": {
+                            "value": "$$Text.Format('RecordAddedDate eq datetime\\\\'{0:yyyy-MM-ddTHH:mm:ss}\\\\'', SliceStart)",
+                            "type": "Expression"
+                        },
+                        "writeBatchSize": 10000
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "Interview_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Interview_Id",
+                                    "type": "Int32"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Candidate_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Candidate_Id",
+                                    "type": "Int32"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Interview_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Interview_Date"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Interviewer_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Interviewer_Id"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Status",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Status",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Remarks",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Remarks"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Round"
+                                },
+                                "sink": {
+                                    "name": "Round"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Result"
+                                },
+                                "sink": {
+                                    "name": "Result"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText21",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "AzureTable12",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "CandidateMasTable",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "LocalToStg",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.csv",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureTableSink",
+                        "azureTableInsertType": {
+                            "value": "$$Text.Format('RecordAddedDate eq datetime\\\\'{0:yyyy-MM-ddTHH:mm:ss}\\\\'', SliceStart)",
+                            "type": "Expression"
+                        },
+                        "writeBatchSize": 10000
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "Candidate_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Candidate_Id",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Gender",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Gender",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Name",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Name"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Email_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Email_Id"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Phone_Number",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Phone_Number"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Source",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Source",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Career_Started_At",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Career_Started_At"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Break_Taken"
+                                },
+                                "sink": {
+                                    "name": "Break_Taken"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Relevant_Experience",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Relevant_Experience",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Status"
+                                },
+                                "sink": {
+                                    "name": "Status"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Offered"
+                                },
+                                "sink": {
+                                    "name": "Offered"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText22",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "AzureTable13",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "ReferralMasTable",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "LocalToStg",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.csv",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureTableSink",
+                        "azureTableInsertType": "merge",
+                        "writeBatchSize": 10000
+                    },
+                    "enableStaging": false,
+                    "parallelCopies": 4,
+                    "dataIntegrationUnits": 4,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "Candidate_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Candidate_Id",
+                                    "type": "Int32"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Emp_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Emp_Id",
+                                    "type": "Int32"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Referral_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Referral_Id",
+                                    "type": "Int32"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Referral_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Referral_Date"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Status"
+                                },
+                                "sink": {
+                                    "name": "Status"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText24",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "AzureTable15",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "Notebook1",
+                "type": "DatabricksNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "EmployeeMasTable",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "InterviewMasTable",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "RecruitmentMasTable",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "CandidateMasTable",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "ReferralMasTable",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebookPath": "/Users/hari.murugesan@saggezza.com/Recruitment-Demo/RDA"
+                },
+                "linkedServiceName": {
+                    "referenceName": "RecruitmentPOC",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "RecruitmentTB",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "Notebook1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.csv",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureTableSink",
+                        "azureTableInsertType": "merge",
+                        "writeBatchSize": 10000
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "Client",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Client",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Experience",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Experience",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Location",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Location",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "On_Hold_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "On_Hold_Date",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Opened_On",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Opened_On",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Priority",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Priority",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Project",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Project",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Remarks",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Remarks",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Request_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Request_Id",
+                                    "type": "Int32"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Resumed_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Resumed_Date",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Role",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Role",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Role_Category",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Role_Category",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Skills",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Skills",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Status",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Status",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Total_Requisition",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Total_Requisition",
+                                    "type": "Int32"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "joined_cnt",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "joined_cnt",
+                                    "type": "Int32"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Cancelled_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Cancelled_Date"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Recruiter",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Recruiter"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Balance_Position"
+                                },
+                                "sink": {
+                                    "name": "Balance_Position"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "NetAgeing",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "NetAgeing"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "ConversionRate",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "ConversionRate"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText26",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "AzureTable16",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "EmployeeTB",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "Notebook1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.csv",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureTableSink",
+                        "azureTableInsertType": "merge",
+                        "writeBatchSize": 10000
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "Emp_Id",
+                                    "type": "Int32"
+                                },
+                                "sink": {
+                                    "name": "Emp_Id"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Name",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Name"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Candidate_Id",
+                                    "type": "Int32"
+                                },
+                                "sink": {
+                                    "name": "Candidate_Id"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Joined_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Joined_Date"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Salary",
+                                    "type": "Int32"
+                                },
+                                "sink": {
+                                    "name": "Salary"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Last_Salary",
+                                    "type": "Int32"
+                                },
+                                "sink": {
+                                    "name": "Last_Salary"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Recruiter"
+                                },
+                                "sink": {
+                                    "name": "Recruiter"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Opened_On",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Opened_On"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Request_Id",
+                                    "type": "Int32"
+                                },
+                                "sink": {
+                                    "name": "Request_Id"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Hire_Time"
+                                },
+                                "sink": {
+                                    "name": "Hire_Time"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Hike_Pert"
+                                },
+                                "sink": {
+                                    "name": "Hike_Pert"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Client"
+                                },
+                                "sink": {
+                                    "name": "Client"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Project"
+                                },
+                                "sink": {
+                                    "name": "Project"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText27",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "AzureTable17",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "CandidatetTB",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "Notebook1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.csv",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureTableSink",
+                        "azureTableInsertType": "merge",
+                        "writeBatchSize": 10000
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "Candidate_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Candidate_Id",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Email_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Email_Id",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Gender",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Gender",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Phone_Number",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Phone_Number",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Relevant_Experience",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Relevant_Experience",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Remarks",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Remarks",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Result",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Result",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Round",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Round",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Source",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Source",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Status",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Status",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Name",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Name",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Career_Started_At",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Career_Started_At",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Break_Taken"
+                                },
+                                "sink": {
+                                    "name": "Break_Taken"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Offered"
+                                },
+                                "sink": {
+                                    "name": "Offered"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText28",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "AzureTable18",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "InterviewTB",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "Notebook1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.csv",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureTableSink",
+                        "azureTableInsertType": "merge",
+                        "writeBatchSize": 10000
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "Interview_Id",
+                                    "type": "Int32"
+                                },
+                                "sink": {
+                                    "name": "Interview_Id"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Candidate_Id",
+                                    "type": "Int32"
+                                },
+                                "sink": {
+                                    "name": "Candidate_Id"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Interviewer_Id",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Interviewer_Id"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Round",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Round"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Result",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Result"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Interview_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Interview_Date"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Status",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Status"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Remarks",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Remarks"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText30",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "AzureTable20",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "ReferralTB",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "Notebook1",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.csv",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureTableSink",
+                        "azureTableInsertType": "merge",
+                        "writeBatchSize": 10000
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "Candidate_Id",
+                                    "type": "Int32"
+                                },
+                                "sink": {
+                                    "name": "Candidate_Id",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Emp_Id",
+                                    "type": "Int32"
+                                },
+                                "sink": {
+                                    "name": "Emp_Id",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Referral_Date",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Referral_Date",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Referral_Id",
+                                    "type": "Int32"
+                                },
+                                "sink": {
+                                    "name": "Referral_Id",
+                                    "type": "String"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "Status",
+                                    "type": "String"
+                                },
+                                "sink": {
+                                    "name": "Status",
+                                    "type": "String"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DelimitedText31",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "AzureTable19",
+                        "type": "DatasetReference"
+                    }
+                ]
+            },
+            {
+                "name": "Delete_Result",
+                "type": "Delete",
+                "dependsOn": [
+                    {
+                        "activity": "EmployeeTB",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "CandidatetTB",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "InterviewTB",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "ReferralTB",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "RecruitmentTB",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "Binary4",
+                        "type": "DatasetReference"
+                    },
+                    "enableLogging": false,
+                    "storeSettings": {
+                        "type": "AzureBlobFSReadSettings",
+                        "recursive": true,
+                        "wildcardFileName": "*.csv"
+                    }
+                }
+            },
+            {
+                "name": "Delete_Stg",
+                "type": "Delete",
+                "dependsOn": [
+                    {
+                        "activity": "Delete_Result",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "Binary5",
+                        "type": "DatasetReference"
+                    },
+                    "enableLogging": false,
+                    "storeSettings": {
+                        "type": "AzureBlobFSReadSettings",
+                        "recursive": true,
+                        "wildcardFileName": "*.csv"
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "windowStart": {
+                "type": "String"
+            },
+            "windowEnd": {
+                "type": "String"
+            }
+        },
+        "annotations": []
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
